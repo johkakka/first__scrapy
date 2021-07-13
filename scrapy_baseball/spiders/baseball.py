@@ -7,10 +7,12 @@ class BaseballSpider(scrapy.Spider):
     start_urls = ['https://baseball.yahoo.co.jp/npb/game/2021000613/stats']
 
     def parse(self, response):
-        result_list = []
         raws = response.css('tr.bb-statsTable__row')
         no = 0
-        team = True
+        team = False
+
+        top_batters = []
+        btm_batters = []
 
         for raw in raws:
             player = raw.css('td.bb-statsTable__data--player a::text').extract_first()
@@ -20,24 +22,28 @@ class BaseballSpider(scrapy.Spider):
                 r = battings_raw[i].css('div.bb-statsTable__dataDetail').extract_first()
                 if r is not None:
                     res[i] = True
-            print(res)
-
 
             if player is None:
                 no = 0
-                team = False
+                team = not team
                 continue
 
-            result_list.append({
-                'player': player,
-                'no': no,
-                'team': team
-            })
+            if team:
+                top_batters.append({
+                    'player': player,
+                    'no': no,
+                    'batting': res
+                })
+            else:
+                btm_batters.append({
+                    'player': player,
+                    'no': no,
+                    'batting': res
+                })
             no += 1
 
-        print(result_list)
-
-        pitcher_list = []
+        top_pitchers = []
+        btm_pitchers = []
         tables = response.css('table.bb-scoreTable')
         team = True
         for table in tables:
@@ -47,16 +53,24 @@ class BaseballSpider(scrapy.Spider):
             for raw in raws:
                 player = raw.css('td.bb-scoreTable__data--player a::text').extract_first()
                 ip = raw.css('td.bb-scoreTable__data--score p::text').extract()[1]
+                inning = int(float(ip))
+                out = inning*3 + int(float(ip)*10 - inning*10)
 
-                pitcher_list.append({
-                    'player': player,
-                    'no': no,
-                    'team': team,
-                    'ip': ip
-                })
+                if team:
+                    top_pitchers.append({
+                        'player': player,
+                        'no': no,
+                        'ip': ip,
+                        'out': out
+                    })
+                else:
+                    btm_pitchers.append({
+                        'player': player,
+                        'no': no,
+                        'ip': ip,
+                        'out': out
+                    })
                 no += 1
 
-            no = 0
-            team = False
+            team = not team
 
-        print(pitcher_list)
