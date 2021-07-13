@@ -1,10 +1,10 @@
 import scrapy
-
+import re
 
 class BaseballSpider(scrapy.Spider):
     name = 'baseball'
     allowed_domains = ['baseball.yahoo.co.jp']
-    start_urls = ['https://baseball.yahoo.co.jp/npb/game/2021000613/stats']
+    start_urls = ['https://baseball.yahoo.co.jp/npb/game/2021000214/stats']
 
     def parse(self, response):
         raws = response.css('tr.bb-statsTable__row')
@@ -19,13 +19,17 @@ class BaseballSpider(scrapy.Spider):
             res = [0]*9
             battings_raw = raw.css('td.bb-statsTable__data--inning')
             for i in range(len(battings_raw)):
-                r = battings_raw[i].css('div.bb-statsTable__dataDetail').extract_first()
+                r = battings_raw[i].css('div.bb-statsTable__dataDetail::text').extract_first()
                 if r is not None:
-                    h = battings_raw[i].css('div.bb-statsTable__dataDetail--hits').extract_first()
-                    if h is not None:
-                        res[i] = 1
+                    h = battings_raw[i].css('div.bb-statsTable__dataDetail--hits::text').extract_first()
+                    print(r)
+                    if h is not None or re.compile("四|死球|失|野").search(r):
+                            res[i] = 1
                     else:
-                        res[i] = -1
+                        if re.compile("併").search(r):
+                            res[i] = -2
+                        else:
+                            res[i] = -1
 
             if player is None:
                 no = 0
