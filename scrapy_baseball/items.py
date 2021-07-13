@@ -7,6 +7,5 @@ import scrapy
 
 
 class ScrapyBaseballItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+    pitcher = scrapy.Field()
+    batter = scrapy.Field()

@@ -1,5 +1,7 @@
 import scrapy
 
+from scrapy_baseball.items import ScrapyBaseballItem
+
 
 class BaseballSpider(scrapy.Spider):
     name = 'baseball'
@@ -7,8 +9,17 @@ class BaseballSpider(scrapy.Spider):
     start_urls = ['https://baseball.yahoo.co.jp/npb/game/2021000214/score?index=0110100']
 
     def parse(self, response):
-
+        result = []
         pitcher = response.css('div#pit .nm a::text').extract_first()
         batter = response.css('div#batter .nm a::text').extract_first()
+        if pitcher is not None and batter is not None:
+            yield ScrapyBaseballItem(pitcher = pitcher,
+                                     batter = batter)
 
-        print(pitcher+","+batter)
+        link = response.css('a#btn_next::attr(href)').extract_first()
+        if link is None:
+            return result
+
+        link = response.urljoin(link)
+        yield scrapy.Request(link, callback=self.parse)
+
