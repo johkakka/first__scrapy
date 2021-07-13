@@ -1,8 +1,9 @@
 import scrapy
 import re
 
-class BaseballSpider(scrapy.Spider):
-    name = 'baseball'
+
+class OldBaseballSpider(scrapy.Spider):
+    name = 'old_baseball'
     allowed_domains = ['baseball.yahoo.co.jp']
     start_urls = ['https://baseball.yahoo.co.jp/npb/game/2021000214/stats']
 
