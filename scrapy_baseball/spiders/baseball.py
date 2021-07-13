@@ -16,12 +16,16 @@ class BaseballSpider(scrapy.Spider):
 
         for raw in raws:
             player = raw.css('td.bb-statsTable__data--player a::text').extract_first()
-            res = [False]*9
+            res = [0]*9
             battings_raw = raw.css('td.bb-statsTable__data--inning')
             for i in range(len(battings_raw)):
                 r = battings_raw[i].css('div.bb-statsTable__dataDetail').extract_first()
                 if r is not None:
-                    res[i] = True
+                    h = battings_raw[i].css('div.bb-statsTable__dataDetail--hits').extract_first()
+                    if h is not None:
+                        res[i] = 1
+                    else:
+                        res[i] = -1
 
             if player is None:
                 no = 0
@@ -41,6 +45,9 @@ class BaseballSpider(scrapy.Spider):
                     'batting': res
                 })
             no += 1
+        #
+        # print(top_batters)
+        # print(btm_batters)
 
         top_pitchers = []
         btm_pitchers = []
