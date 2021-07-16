@@ -9,3 +9,4 @@ import scrapy
 class ScrapyBaseballItem(scrapy.Item):
     pitcher = scrapy.Field()
     batter = scrapy.Field()
+    result = scrapy.Field()
