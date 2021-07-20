@@ -27,7 +27,7 @@ def main():
                     p[batter][0] += bat
                     p[batter][1] += hit
 
-    print(dic)
+    # print(dic)
 
     with open(write_path, mode='w') as f:
         f.writelines("no, from, to, weight\n")
@@ -51,11 +51,11 @@ def main():
                         else:
                             r[d[1]] += 1
 
-                for node1 in res:
-                    for node2 in res[node1]:
-                        m = str(i) + ", " + str(node1) + ", " + str(node2) + ", " + str(res[node1][node2]) + "\n"
-                        f.writelines(m)
-                        i += 1
+        for node1 in res:
+            for node2 in res[node1]:
+                m = str(i) + ", " + str(node1) + ", " + str(node2) + ", " + str(res[node1][node2]) + "\n"
+                f.writelines(m)
+                i += 1
 
 
 if __name__ == '__main__':
